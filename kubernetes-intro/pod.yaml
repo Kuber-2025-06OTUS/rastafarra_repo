@@ -14,7 +14,7 @@ spec:
         - echo "hello world" > /init/index.html
       volumeMounts:
         - name: shared-volume
-          mountPath: ./init
+          mountPath: /init
   containers:
     - name: main-container
       image: python:3.9-slim
