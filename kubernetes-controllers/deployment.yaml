@@ -25,7 +25,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: init-container
-          image: python:3.9-slim
+          image: busybox:latest
           imagePullPolicy: Always
           command:
             - echo "hello world" > /init/index.html
