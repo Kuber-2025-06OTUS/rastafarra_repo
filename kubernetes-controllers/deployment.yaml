@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hodework
+  namespace: homework
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  selector:
+    matchLabels:
+      app: hodework
+  template:
+    metadata:
+      labels:
+        app: hodework
+    spec:
+      nodeSelector:
+        homework: "true"
+      volumes:
+        - name: shared-volume
+          emptyDir: {}
+      initContainers:
+        - name: init-container
+          image: busybox:latest
+          imagePullPolicy: Always
+          command:
+            - echo "hello world" > /init/index.html
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /init
+      containers:
+        - name: main-container
+          image: python:3.9-slim
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /homework
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "rm -f /homework/index.html"]
+          command:
+            - python3 -m http.server "8000"
+          workingDir: /homework
