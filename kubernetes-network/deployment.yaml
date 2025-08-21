@@ -40,6 +40,14 @@ spec:
           volumeMounts:
             - name: shared-volume
               mountPath: /homework
+
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
           lifecycle:
             preStop:
               exec:
