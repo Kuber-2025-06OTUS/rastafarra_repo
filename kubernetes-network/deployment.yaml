@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hodework
+  name: nodework
   namespace: homework
 spec:
   replicas: 3
@@ -12,11 +12,11 @@ spec:
       maxSurge: 0
   selector:
     matchLabels:
-      app: hodework
+      app: nodework
   template:
     metadata:
       labels:
-        app: hodework
+        app: nodework
     spec:
       nodeSelector:
         homework: "true"
@@ -25,7 +25,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: init-container
-          image: srv-nexus-dev01.nauka.local:10084/docker-images/busybox:latest
+          image: busybox:latest
           imagePullPolicy: Always
           command: ["sh", "-c"]
           args: ["echo 'hello world' > /init/index.html"]
@@ -34,9 +34,9 @@ spec:
               mountPath: /init
       containers:
         - name: main-container
-          image: srv-nexus-dev01.nauka.local:10084/docker-images/python:3.9-slim
+          image: python:3.9-slim
           ports:
-            - containerPort: 8000
+            - containerPort: 80
           volumeMounts:
             - name: shared-volume
               mountPath: /homework
@@ -44,7 +44,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /index.html
-              port: 8000
+              port: 80
             initialDelaySeconds: 5
             periodSeconds: 10
 
@@ -52,5 +52,5 @@ spec:
             preStop:
               exec:
                 command: ["sh", "-c", "rm -f /homework/index.html"]
-          command: ["python3", "-m", "http.server", "8000"]
+          command: ["python3", "-m", "http.server", "80"]
           workingDir: /homework
